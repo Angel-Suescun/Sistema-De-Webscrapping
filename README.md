@@ -35,7 +35,7 @@ Este proyecto se eligió por su enfoque práctico y aplicable en el mundo real. 
 
 Este proyecto no solo aborda un problema concreto de recolección y organización de datos, sino que también brinda experiencia valiosa en herramientas de programación avanzadas y en la creación de soluciones eficientes y adaptables.
 
-
+# Diagrama De Clases
 
 
 
