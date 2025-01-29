@@ -4,8 +4,7 @@
 
 ## Contexto y Motivación
 
-El **web scraping** es una técnica que permite automatizar la extracción de datos de sitios web, facilitando el acceso y análisis de información de manera eficiente. En un mundo impulsado por datos, esta herramienta es clave para tomar decisiones fundamentadas y optimizar procesos.
-
+El **web scraping** es una técnica que permite automatizar la extracción de datos de sitios web, facilitando el acceso y análisis de información de manera eficiente.
 Entre sus principales ventajas están:
 
 - **Automatización**: Reduce el tiempo y esfuerzo de la recopilación manual.
@@ -21,11 +20,11 @@ Este proyecto se eligió porque, entre las alternativas disponibles, tiene un ob
 ##  Objetivos:
 
 - ## Objetivo General
-  - Desarrollar una aplicación que emule un sistema de **web scraping** utilizando **Python** y los principios de **Programación Orientada a Objetos (POO)**, con el fin de extraer, organizar y analizar datos de sitios web dinámicos.
+  - Desarrollar una aplicación que emule un sistema de **web scraping** utilizando **Python** y los principios de **Programación Orientada a Objetos (POO)** enseñados en clase, con el fin de extraer, organizar y analizar datos de sitios web dinámicos.
 
  - ## Objetivos Específicos
     1. Desarrollar un sistema de scraping que permita extraer texto de sitios web tipo **wiki**, identificando y organizando la información relevante.
-    2. Implementar un proceso de extracción de publicaciones de plataformas de comercio o bienes raíces, generar reportes con los datos recolectados y organizarlos por ciudad o localidad.
+    2. Implementar un proceso de extracción de publicaciones de plataformas de bienes raíces, generar reportes con los datos recolectados y organizarlos por ciudad o localidad.
     3. Aplicar principios de **POO** para estructurar el código en clases y objetos que faciliten la reutilización, extensión y mantenimiento del sistema.
 
 
@@ -37,64 +36,66 @@ Este proyecto no solo aborda un problema concreto de recolección y organizació
 
 # Diagrama De Clases
 
-
-
-
-
-
-
-## Alcance Del Proyecto, en la solucion
-
 ```mermaid
-
 classDiagram
     class ScraperUrl {
-        -url: String
-        +validate_url(): bool
-        +get_url(): String
+        - url: String
+        + validate_url(): bool
+        + get_url(): String
     }
 
     class LOLUrl {
-        -url: ScraperUrl
-        +validate_url(): bool
+        - url: ScraperUrl
+        + validate_url(): bool
+        + is_champion_url(): bool
+        + is_type_url(): bool
     }
 
-    class MLUrl {
-        -url: ScraperUrl
-        +validate_url(): bool 
+    class RSUrl {
+        - url: ScraperUrl
+        + validate_url(): bool
+        + is_location_url(): bool
+        + is_size_url(): bool
     }
 
     class BaseScraper {
-        -url: ScraperUrl
-        -headers: Dict
-        +get_html(timeout: int = 10): String
+        - url: ScraperUrl
+        - headers: Dict
+        + get_html(timeout: int = 10): String
     }
-
 
     class LOLScraper {
-        -url: LOLUrl
-        -soup: BeautifulSoup
-        +parse_champions(): List[Dict]
+        - url: LOLUrl
+        - soup: BeautifulSoup
+        + parse_champions(): List[Dict]
     }
 
-    class MLScraper {
-        -url: MLUrl
-        -soup: BeautifulSoup
-        +parse_item_info(): List[Dict]
+    class RSScraper {
+        - url: RSUrl
+        - soup: BeautifulSoup
+        + parse_info(): List[Dict]
     }
 
-    ScraperUrl *-- BaseScraper
+    %% Definir herencias después
+    
+    BaseScraper <|-- RSScraper
+    
+
+    %% Definir relaciones de composición primero
     ScraperUrl <|-- LOLUrl
-    ScraperUrl <|-- MLUrl
+    ScraperUrl <|-- RSUrl
+
+    LOLUrl *-- LOLScraper
+    RSUrl *-- RSScraper
+    ScraperUrl *-- BaseScraper
     BaseScraper <|-- LOLScraper
-    BaseScraper <|-- MLScraper
+
 
 ```
 ```mermaid
 
 classDiagram
     class ScraperException {
-        <<abstract>>
         +message: String
     }
 
@@ -116,3 +117,31 @@ classDiagram
     ScraperException <|-- InvalidURLError
     ScraperException <|-- HTTPError
 ```
+
+## **Solución Preliminar**
+
+### **Clases y Componentes**
+
+1. **`ScraperUrl`**:
+   - Se encarga de manejar y validar URLs.
+
+2. **`BaseScraper`**:
+   - Clase genérica que realiza solicitudes HTTP y devuelve el contenido HTML.
+   - Utiliza composición con `ScraperUrl`.
+
+3. **Clases especializadas**:
+   - **`LOLScraper`**:
+     - Diseñada para extraer estadísticas de campeones desde la wiki de League of Legends.
+     - Utiliza herencia del `BaseScraper` y se compone de un `LOLUrl`
+
+   - **`RSScraper`**:
+     - Diseñada para extraer información de propiedades desde sitios de bienes raíces.
+     - Utiliza herencia del `BaseScraper` y se compone de un `RSUrl`
+     - Datos que extraerá:
+       - **Precio**: Muestra el precio de cada propiedad.
+       - **Tamaño**: Área en metros cuadrados.
+       - **Ciudad**: Ubicación de la propiedad.
+
+4. **Excepciones Personalizadas**:
+   - Definen errores específicos como `ConnectionError`, `InvalidURLError` y `HTTPError`.
+
