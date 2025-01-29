@@ -36,6 +36,8 @@ Este proyecto no solo aborda un problema concreto de recolección y organizació
 
 # Diagrama De Clases
 
+## **Scraper y URLs:**
+
 ```mermaid
 classDiagram
     class ScraperUrl {
@@ -92,6 +94,8 @@ classDiagram
 
 
 ```
+## **Excepciones:**
+
 ```mermaid
 
 classDiagram
@@ -116,6 +120,84 @@ classDiagram
     ScraperException <|-- ConnectionError
     ScraperException <|-- InvalidURLError
     ScraperException <|-- HTTPError
+```
+## **GUI**(Opcional):
+
+```mermaid
+
+classDiagram
+    class UIManager {
+        +show_main_window()
+        +navigate_to(view: str)
+    }
+
+    class MainWindow {
+        +init_UI()
+        +show_results()
+        +open_config()
+    }
+
+    class ResultsView {
+        +display_results(data: List[Dict])
+        +export_data(format: str)
+    }
+
+    class ConfigView {
+        +set_scraper_settings(urls: List[str], filters: Dict)
+    }
+
+    class ReportView {
+        +generate_report(format: str)
+        +preview_report()
+    }
+
+    UIManager --> MainWindow
+    MainWindow --> ResultsView
+    MainWindow --> ConfigView
+    MainWindow --> ReportView
+
+```
+
+
+## **Data**:
+
+```mermaid
+classDiagram
+    class DataHandler {
+        +process_data(data: List[Dict]) : List[Dict]
+        +send_data(data: List[Dict], target: str)
+        +save_data(data: List[Dict], format: str)
+    }
+
+    class DataStorage {
+        +save_data(data: List[Dict], format: str)
+        +load_data(file_path: str) : List[Dict]
+    }
+
+    class DataProcessor {
+        +process_data(raw_data: List[Dict]) : List[Dict]
+        +clean_data(data: List[Dict]) : List[Dict]
+    }
+
+    class DataCleaner {
+        +delete_data(file_path: str)
+    }
+
+    class DataSender {
+        +send_data(data: List[Dict], target: str)
+    }
+
+    DataHandler <|-- DataStorage
+    DataHandler <|-- DataProcessor
+    DataHandler <|-- DataSender
+
+    DataProcessor --> DataSender 
+    DataSender --> DataStorage 
+    DataSender --> UIManager 
+    DataSender --> ReportView  
+    DataProcessor --> DataCleaner 
+
+
 ```
 
 ## **Solución Preliminar**
@@ -144,6 +226,60 @@ classDiagram
 
 4. **Excepciones Personalizadas**:
    - Definen errores específicos como `ConnectionError`, `InvalidURLError` y `HTTPError`.
+
+5. **Clases de la Interfaz Gráfica**:
+
+   Se usara la libreria **PyQT6** para facilitar el trabajo
+
+  - **`UIManager`**:
+      - Controla la ventana principal y la navegación entre vistas.
+      - Gestiona la navegación entre vistas y controla el flujo de interacción del usuario.
+
+  - **`MainWindow`**:
+      - Contiene los botones y menús principales de la interfaz.
+     -  Recibe comandos de `UIManager` y gestiona la interacción con las vistas.
+
+  - **`ResultsView`**:
+      - Muestra los datos obtenidos en una tabla.
+      - Recibe datos (generalmente de un scraper o base de datos) y los muestra en la interfaz de usuario.
+
+  - **`ConfigView`**:
+      - Permite configurar opciones del scraping (URLs, filtros, etc.).
+      - Recibe entradas del usuario y las envía a un controlador de configuración.
+
+  - **`ReportView`**:
+      - Opción para exportar los datos en PDF o CSV.
+      - Recibe los datos desde `ResultsView` y los exporta en el formato elegido por el usuario.
+  
+  6. **Clases Del Manejo de Datos**:
+
+  - **`DataHandler`**:
+      - Clase base abstracta para manejar la manipulación y distribución de los datos.
+      - Define los métodos comunes `process_data()`, `send_data()` y `save_data()`.
+
+  - **`DataStorage`**:
+     - Se encarga de almacenar los datos procesados en archivos, como JSON o CSV.
+     - Hereda de `DataHandler` y sobrescribe el método `save_data()` para guardar los datos en el formato especificado.
+    - **Datos almacenados**:
+       - Guarda los datos procesados o limpiados, listos para ser utilizados o exportados.
+
+- **`DataProcessor`**:
+     - Se encarga de procesar y limpiar los datos que recibe.
+     - Hereda de `DataHandler` y sobrescribe los métodos `process_data()` y `clean_data()`
+     - **Datos procesados**:
+       - Convierte los datos crudos en un formato estandarizado, limpio y listo para su uso.
+
+
+- **`DataSender`**:
+     - Se encarga de enviar los datos procesados a otros módulos, como almacenamiento, interfaz gráfica o reporte.
+     - Hereda de `DataHandler` y sobrescribe el método `send_data()`.
+     - **Flujo de datos**:
+       - Envía los datos procesados a los destinos correspondientes: `DataStorage` (para guardar), `UIManager` (para mostrar en la interfaz gráfica) o `ReportView` (para exportar los datos).
+
+- **`DataCleaner`**:
+     - Se encarga de eliminar los archivos o datos que ya no son necesarios una vez finalizada la ejecución del programa.
+
+
 
 ### **Estructura de Archivos**
 ```
