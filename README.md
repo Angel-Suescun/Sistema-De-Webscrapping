@@ -145,3 +145,29 @@ classDiagram
 4. **Excepciones Personalizadas**:
    - Definen errores específicos como `ConnectionError`, `InvalidURLError` y `HTTPError`.
 
+### **Estructura de Archivos**
+```
+The_ScrapeRift/
+│── src/
+│   ├── GUI/
+│   │   ├── __init__.py
+│   ├── configuration/
+│   │   ├── __init__.py
+│   ├── data/
+│   │   ├── __init__.py
+│   ├── errorManagement/
+│   │   ├── __init__.py
+│   ├── executionControl/
+│   │   ├── __init__.py
+│   ├── moduleController/
+│   │   ├── __init__.py
+│   ├── scrapper/
+│   │   ├── __init__.py
+│   ├── url/
+│   │   ├── __init__.py
+│   ├── __init__.py
+│   ├── main.py
+│── README.md
+```
+
+
