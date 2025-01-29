@@ -191,11 +191,12 @@ classDiagram
     DataHandler <|-- DataProcessor
     DataHandler <|-- DataSender
 
+    DataProcessor --> DataCleaner
     DataProcessor --> DataSender 
     DataSender --> DataStorage 
     DataSender --> UIManager 
     DataSender --> ReportView  
-    DataProcessor --> DataCleaner 
+     
 
 
 ```
