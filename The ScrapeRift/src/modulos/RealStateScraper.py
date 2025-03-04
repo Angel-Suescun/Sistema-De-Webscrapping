@@ -131,6 +131,8 @@ class RealStateScraper(BaseScraper):
                     WebDriverWait(self.driver, 10).until(lambda d: boton.is_displayed())
                 except Exception as e:
                     logging.exception("Error al hacer clic en el botón de la página %s: %s", i, e)
+        if len(tamanos_totales) != len(precios_totales):
+            tamanos_totales.append(0)
         data = self.combine_to_dict(precios_totales, ubicaciones_totales, tamanos_totales)
         self.save_to_json(data)
         return data
