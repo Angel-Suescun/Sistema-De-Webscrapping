@@ -27,7 +27,6 @@ Este proyecto se eligió porque, entre las alternativas disponibles, tiene un ob
     2. Implementar un proceso de extracción de publicaciones de plataformas de bienes raíces, generar reportes con los datos recolectados y organizarlos por ciudad o localidad.
     3. Aplicar principios de **POO** para estructurar el código en clases y objetos que faciliten la reutilización, extensión y mantenimiento del sistema.
 
-
 ## Justificacion
 
 Este proyecto se eligió por su enfoque práctico y aplicable en el mundo real. El **web scraping** permite automatizar la recolección de datos de sitios dinámicos, lo cual es útil en áreas como el análisis de mercado o bienes raíces. Además, aplicar **Programación Orientada a Objetos (POO)** garantiza un código modular, escalable y fácil de mantener, lo que favorece su reutilización y expansión futura.
@@ -36,222 +35,166 @@ Este proyecto no solo aborda un problema concreto de recolección y organizació
 
 # Diagrama De Clases
 
-## **Scraper y URLs:**
+## Scraper
 
 ```mermaid
 classDiagram
-    class ScraperUrl {
-        - url: String
-        + validate_url(): bool
-        + get_url(): String
-    }
-
-    class LOLUrl {
-        - url: ScraperUrl
-        + validate_url(): bool
-        + is_champion_url(): bool
-        + is_type_url(): bool
-    }
-
-    class RSUrl {
-        - url: ScraperUrl
-        + validate_url(): bool
-        + is_location_url(): bool
-        + is_size_url(): bool
-    }
-
     class BaseScraper {
-        - url: ScraperUrl
-        - headers: Dict
-        + get_html(timeout: int = 10): String
+        + driver
+        +__enter__() BaseScraper
+        +__exit__(exc_type, exc_val, exc_tb) None
+        +wait_for_element(by: By, value: str, timeout: int) WebElement
+        +scrape() None
     }
 
-    class LOLScraper {
-        - url: LOLUrl
-        - soup: BeautifulSoup
-        + parse_champions(): List[Dict]
+    class RealStateScraper {
+        + driver
+        + number_page
+        + base_url
+
+        +extract_price() List[str]
+        +extract_location() List[str]
+        +extract_size() List[str]
+        +combine_to_dict(prices: List[str], locations: List[str], sizes: List[str]) Dict
+        +scroll_until_find_element(page: int, max_intentos: int) WebElement
+        +determine_max_page() int
+        +save_to_json(data: Dict, filename: str) None
+        +scrape() Dict
     }
 
-    class RSScraper {
-        - url: RSUrl
-        - soup: BeautifulSoup
-        + parse_info(): List[Dict]
+    class LolScraper {
+        + driver
+        + champion
+        + base_url
+        +extract_champion_names() List[str]
+        +extract_champion_health() str
+        +extract_champion_mana() str
+        +extract_champion_health_regen() str
+        +extract_champion_mana_regen() str
+        +extract_champion_armor() str
+        +extract_champion_attack_damage() str
+        +extract_champion_magic_resist() str
+        +extract_champion_crit_damage() str
+        +excact_move_speed() str
+        +extract_champion_range() str
+        +save_to_json(data: Dict, filename: str) None
+        +scrape() Dict
     }
-
-    %% Definir herencias después
-    
-    BaseScraper <|-- RSScraper
-    
-
-    %% Definir relaciones de composición primero
-    ScraperUrl <|-- LOLUrl
-    ScraperUrl <|-- RSUrl
-
-    LOLUrl *-- LOLScraper
-    RSUrl *-- RSScraper
-    ScraperUrl *-- BaseScraper
-    BaseScraper <|-- LOLScraper
-
+    BaseScraper <|-- RealStateScraper
+    BaseScraper <|-- LolScraper
 
 ```
-## **Excepciones:**
-
-```mermaid
-
-classDiagram
-    class ScraperException {
-        +message: String
-    }
-
-    class ConnectionError {
-        +message: String
-    }
-
-
-    class InvalidURLError {
-        +message: String
-    }
-
-    class HTTPError {
-        +message: String
-        +status_code: int
-    }
-
-    ScraperException <|-- ConnectionError
-    ScraperException <|-- InvalidURLError
-    ScraperException <|-- HTTPError
-```
-## **GUI**(Opcional):
-
-```mermaid
-
-classDiagram
-    class UIManager {
-        +show_main_window()
-        +navigate_to(view: str)
-    }
-
-    class MainWindow {
-        +init_UI()
-        +show_results()
-        +open_config()
-    }
-
-    class ResultsView {
-        +display_results(data: List[Dict])
-        +export_data(format: str)
-    }
-
-    class ConfigView {
-        +set_scraper_settings(urls: List[str], filters: Dict)
-    }
-
-    class ReportView {
-        +generate_report(format: str)
-        +preview_report()
-    }
-
-    UIManager --> MainWindow
-    MainWindow --> ResultsView
-    MainWindow --> ConfigView
-    MainWindow --> ReportView
-
-```
-
-
-## **Data**:
-
+## Data
 ```mermaid
 classDiagram
     class DataHandler {
-        +process_data(data: List[Dict]) : List[Dict]
-        +send_data(data: List[Dict], target: str)
-        +save_data(data: List[Dict], format: str)
-    }
-
-    class DataStorage {
-        +save_data(data: List[Dict], format: str)
-        +load_data(file_path: str) : List[Dict]
+        +__init__(data: dict, json_file: str)
+        +process_data() None
+        +send_data() None
+        +save_data(data: dict) None
     }
 
     class DataProcessor {
-        +process_data(raw_data: List[Dict]) : List[Dict]
-        +clean_data(data: List[Dict]) : List[Dict]
+        +__init__(json_file: str)
+        +process_data() dict
+        +save_data(data: dict) None
+        +send_data() None
     }
 
-    class DataCleaner {
-        +delete_data(file_path: str)
+
+    class DataStorage {
+        +__init__(data: dict, json_file: str, save_json: str)
+        +save_data(data: dict) None
+        +process_data() None
+        +send_data() None
     }
 
     class DataSender {
-        +send_data(data: List[Dict], target: str)
+        +__init__(data: dict, json_file: str)
+        +send_data() None
+        +process_data() None
+        +save_data(data: dict) None
     }
 
-    DataHandler <|-- DataStorage
+    class DataCleaner {
+        +__init__(data: dict)
+        +clean_data() None
+    }
+
     DataHandler <|-- DataProcessor
+    DataHandler <|-- DataStorage
     DataHandler <|-- DataSender
-
-    DataProcessor --> DataCleaner
-    DataProcessor --> DataSender 
-    DataSender --> DataStorage 
-    DataSender --> UIManager 
-    DataSender --> ReportView  
-     
-
-
 ```
+## Urls
 
+```mermaid
+classDiagram
+    class Url {
+        + url  
+        +change_url(**kwargs) str
+    }
+
+    class RSUrl {
+        +__init__(base_url: str)
+        +change_url(modo: str, ciudad: str, barrio: Optional[str]) str
+    }
+
+    class WikiUrl {
+        +__init__(base_url: str)
+        +change_url(champion: str) str
+    }
+    Url <|-- RSUrl
+    Url <|-- WikiUrl
+````
 ## **Solución Preliminar**
 
 ### **Clases y Componentes**
 
-1. **`ScraperUrl`**:
+1. **`Url`**:
    - Se encarga de manejar y validar URLs.
 
 2. **`BaseScraper`**:
    - Clase genérica que realiza solicitudes HTTP y devuelve el contenido HTML.
-   - Utiliza composición con `ScraperUrl`.
 
 3. **Clases especializadas**:
    - **`LOLScraper`**:
      - Diseñada para extraer estadísticas de campeones desde la wiki de League of Legends.
      - Utiliza herencia del `BaseScraper` y se compone de un `LOLUrl`
 
-   - **`RSScraper`**:
+   - **`RealStateScraper`**:
      - Diseñada para extraer información de propiedades desde sitios de bienes raíces.
-     - Utiliza herencia del `BaseScraper` y se compone de un `RSUrl`
+     - Utiliza herencia del `BaseScraper`
      - Datos que extraerá:
        - **Precio**: Muestra el precio de cada propiedad.
        - **Tamaño**: Área en metros cuadrados.
        - **Ciudad**: Ubicación de la propiedad.
 
 4. **Excepciones Personalizadas**:
-   - Definen errores específicos como `ConnectionError`, `InvalidURLError` y `HTTPError`.
+   - Definen errores específicos como `ElementNotFound`, `WebDriverError`, etc.
 
 5. **Clases de la Interfaz Gráfica**:
 
    Se usara la libreria **PyQT6** para facilitar el trabajo
 
-  - **`UIManager`**:
-      - Controla la ventana principal y la navegación entre vistas.
-      - Gestiona la navegación entre vistas y controla el flujo de interacción del usuario.
+  - **`VentadaArriendos`**:
+      - Ventana para seleccionar opciones de scraping de arriendos.
 
-  - **`MainWindow`**:
-      - Contiene los botones y menús principales de la interfaz.
-     -  Recibe comandos de `UIManager` y gestiona la interacción con las vistas.
+  - **`VentanaBarrio`**:
+      - Ventana para ingresar datos de scraping por barrio.
 
-  - **`ResultsView`**:
-      - Muestra los datos obtenidos en una tabla.
-      - Recibe datos (generalmente de un scraper o base de datos) y los muestra en la interfaz de usuario.
+  - **`VentanaCiudad`**:
+      - Ventana para ingresar datos de scraping por ciudad.
 
-  - **`ConfigView`**:
-      - Permite configurar opciones del scraping (URLs, filtros, etc.).
-      - Recibe entradas del usuario y las envía a un controlador de configuración.
+  - **`VentanaDatos`**:
+      - Ventana para mostrar los datos scrapeados.
+  - **`VentanaDatosLol`**:
+      - Ventana para mostrar los datos scrapeados de un campeón de LoL
+  - **`VentanaLol`**:
+      - Ventana para ingresar el nombre de un campeón de LoL y realizar el scraping.
 
-  - **`ReportView`**:
-      - Opción para exportar los datos en PDF o CSV.
-      - Recibe los datos desde `ResultsView` y los exporta en el formato elegido por el usuario.
-  
+  - **`VentanaPrincipal`**:
+     - Ventana principal que permite seleccionar entre scraping de arriendos o scraping de LoL.
+
   6. **Clases Del Manejo de Datos**:
 
   - **`DataHandler`**:
@@ -280,31 +223,74 @@ classDiagram
 - **`DataCleaner`**:
      - Se encarga de eliminar los archivos o datos que ya no son necesarios una vez finalizada la ejecución del programa.
 
-
-
-### **Estructura de Archivos**
+# **Estructura de Archivos**
 ```
-The_ScrapeRift/
+The ScrapeRift/
+│── init.py
 │── src/
-│   ├── GUI/
-│   │   ├── __init__.py
-│   ├── configuration/
-│   │   ├── __init__.py
-│   ├── data/
-│   │   ├── __init__.py
-│   ├── errorManagement/
-│   │   ├── __init__.py
-│   ├── executionControl/
-│   │   ├── __init__.py
-│   ├── moduleController/
-│   │   ├── __init__.py
-│   ├── scrapper/
-│   │   ├── __init__.py
-│   ├── url/
-│   │   ├── __init__.py
-│   ├── __init__.py
-│   ├── main.py
-│── README.md
+│ ├── main.py
+│ ├── data/
+│ │ ├── DataCleaner.py
+│ │ ├── DataHandler.py
+│ │ ├── DataProcessor.py
+│ │ ├── DataSender.py
+│ │ ├── DataStorage.py
+│ │ ├── init.py
+│ ├── GUI/
+│ │ ├── VentanaArriendos.py
+│ │ ├── VentanaBarrio.py
+│ │ ├── VentanaCiudad.py
+│ │ ├── VentanaDatos.py
+│ │ ├── VentanaDatosLol.py
+│ │ ├── VentanaLol.py
+│ │ ├── VentanaPrincipal.py
+│ │ ├── init.py
+│ ├── modulos/
+│ │ ├── init.py
+│ │ ├── BaseScraper.py
+│ │ ├── RealStateScraper.py
+│ │ ├── UrlManager.py
+│ │ ├── WikiScraper.py
+| ├── requirements.txt
+| ├── readme.md
+```
+# Implementación
+
+## Entorno Virual
+Para ejecutar este proyecto es recomendable hacerlo con un entorno virtual. En este caso usaremos de ejemplo miniconda para crear el entorno
+
+### 1. Instalar miniconda (si no se tiene)
+Puedes ir al siguiente link y seguir los pasos para instalar la aplicación requerida https://www.anaconda.com/download
+
+### 2. Crear el entorno virtual
+Vas a ejecutar los siguientes comandos en orden en el Anaconda Prompt o en el terminal que tengas
+
+```bash
+conda create -n webscrapping-env python=3.9
 ```
 
+### 3. Ir a la carpeta del proyecto
+Una vez descargado el paquete del proyecto, en el explorador de archivos copea el path en el que está guardado y ejecuta este comando
 
+```bash
+cd "PEGA AQUI EL PATH"
+```
+### 4. Activar el entorno
+Se activa el entorno para que la instalación de librerias se haga de manera correcta
+
+```bash
+avtivate webscrapping-env
+```
+
+### 5. Instalación de requerimientos
+En este paso instalaremos las librerias necesarias para la ejecución del programa. Para ello usaremos el **requirements.txt** que viene con el paquete del proyecto y ejecutamos el siguiente comando
+
+```bash
+pip install -r requirements.txt
+```
+### 6. Ejecución del proyecto
+Finalmente ejecutamos el proyecto con el siguiente comando
+
+```bash
+python src/main.py
+```
