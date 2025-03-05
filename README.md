@@ -254,6 +254,12 @@ The ScrapeRift/
 | ├── requirements.txt
 | ├── readme.md
 ```
+# Importante
+### Es necesario descargar el chromedriver en la ultima versión que se tenga el navegador, pues este fue implementado para el proyecto. Por defecto en los archivos del proyecto viene incluido un driver, sin embargo es posible que por incopatibilidad de versiones no sea posible ejecutar el programa. 
+### En el siguiente link se encuentran las ultimas versiones del webdriver https://googlechromelabs.github.io/chrome-for-testing/
+### Verifica que la version del driver coincida con la versión del navegador Chrome. Se descarga y se extrae el Chrome.exe en el paquete "modulos" del proyecto  
+
+
 # Implementación
 
 ## Entorno Virual
