@@ -1,0 +1,5 @@
+# Paquetes principales
+selenium	          # Para automatización del navegador
+PyQt6           	  # Para la interfaz gráfica
+PyQt6-Qt6		  # Dependencias de Qt para PyQt6
+PyQt6-sip       	  # Bindings de SIP para PyQt6
